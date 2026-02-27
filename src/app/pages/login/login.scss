@@ -1,0 +1,13 @@
+.border-success-cfe {
+    border: 2px solid #008248 !important;
+}
+
+.btn-success-cfe {
+    background-color: #008248;
+    color: white;
+
+    &:hover {
+        background-color: #006a3a;
+        color: white;
+    }
+}
