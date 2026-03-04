@@ -5,24 +5,30 @@
         <div class="card-body p-4">
             <h3 class="text-center mb-4 fw-bold">Acceso SICA</h3>
 
+            <div *ngIf="errorMensaje" class="alert alert-danger py-2 shadow-sm border-0 mb-3" role="alert">
+                <i class="bi bi-exclamation-circle-fill me-2"></i> {{ errorMensaje }}
+            </div>
+
             <form (ngSubmit)="ingresar()">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">RPE / RTE:</label>
-                    <input type="text" class="form-control" placeholder="Ej. 9XXXX" name="rpe">
+                    <input type="text" class="form-control" placeholder="Ej. 9XXXX" name="rpe" [(ngModel)]="rpe"
+                        (input)="errorMensaje = null" required>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Contraseña:</label>
                     <div class="input-group">
                         <input [type]="mostrarPassword ? 'text' : 'password'" class="form-control" name="password"
-                            placeholder="••••••••">
+                            placeholder="••••••••" [(ngModel)]="password" (input)="errorMensaje = null" required>
                         <button (click)="togglePassword()" class="btn btn-outline-secondary" type="button">
                             <i class="bi" [ngClass]="mostrarPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success-cfe w-100 fw-bold shadow-sm">
+                <button type="submit" class="btn btn-success-cfe w-100 fw-bold shadow-sm"
+                    [disabled]="!rpe || !password">
                     Ingresar
                 </button>
             </form>
