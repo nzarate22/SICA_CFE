@@ -9,25 +9,25 @@
 
   <div class="card shadow-sm mb-4 border-success-cfe">
     <div class="card-body">
-      <div class="row g-3 align-items-end">
+      <div class="row g-3 align-items-end mb-4">
         <div class="col-md-3">
-          <label class="form-label fw-bold">Número de Trabajador (RPE/RTE):</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-            <input type="text" class="form-control" placeholder="Ej. 9XXXX">
-          </div>
+          <label class="form-label fw-bold">RPE:</label>
+          <input type="text" class="form-control" [(ngModel)]="rpeBusqueda" placeholder="Ej. 9NJHC">
         </div>
+
         <div class="col-md-3">
-          <label class="form-label fw-bold">Fecha Desde:</label>
-          <input type="date" class="form-control">
+          <label class="form-label fw-bold">Desde:</label>
+          <input type="date" class="form-control" [(ngModel)]="fechaInicio">
         </div>
+
         <div class="col-md-3">
-          <label class="form-label fw-bold">Fecha Hasta:</label>
-          <input type="date" class="form-control">
+          <label class="form-label fw-bold">Hasta:</label>
+          <input type="date" class="form-control" [(ngModel)]="fechaFin">
         </div>
+
         <div class="col-md-3">
-          <button class="btn btn-buscar-sica w-100 fw-bold shadow-sm">
-            <i class="bi bi-search me-2"></i>Buscar
+          <button class="btn btn-outline-dark w-100" (click)="buscar()" [disabled]="cargando">
+            <i class="bi bi-search"></i> {{ cargando ? 'Buscando...' : 'Buscar' }}
           </button>
         </div>
       </div>
@@ -36,7 +36,7 @@
 
   <div class="mb-3 px-2">
     <span class="fs-5 fw-bold text-dark">Colaborador:</span>
-    <span class="fs-5 ms-2 text-secondary">Nombre del Trabajador Seleccionado</span>
+    <span class="fs-5 ms-2 text-secondary">{{ nombreColaborador }}</span>
   </div>
 
   <div class="card shadow-sm mb-4">
@@ -44,41 +44,13 @@
       <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
           <tr>
-            <th class="ps-4" style="width: 20%;">Fecha</th>
-            <th style="width: 20%;">Entrada</th>
-            <th style="width: 20%;">Salida</th>
-            <th style="width: 20%;">Estado</th>
-            <th class="text-center" style="width: 20%;">Omisión</th>
+            <th class="ps-4">Fecha</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Estatus</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td colspan="5" class="text-center py-5 text-muted">
-              <i class="bi bi-info-circle me-2"></i>
-              Ingrese los filtros y presione "Buscar" para visualizar las asistencias.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="row align-items-start">
-    <div class="col-md-6">
-      <button class="btn btn-reporte-sica fw-bold shadow-sm">
-        <i class="bi bi-file-earmark-pdf-fill me-2"></i>Generar Reporte
-      </button>
-    </div>
-
-    <div class="col-md-6 text-end">
-      <div class="mb-2">
-        <span class="fw-bold me-2">Total Retardos:</span>
-        <span class="badge badge-count">0</span>
-      </div>
-      <div>
-        <span class="fw-bold me-2">Total Inasistencias:</span>
-        <span class="badge badge-count">0</span>
-      </div>
-    </div>
-  </div>
-</div>
+          <tr *ngFor="let evento of listaEventos">
+            <td class="ps-4">{{ evento.fecha }}</td>
+            <td>{{ evento.dir === 'IN' ?

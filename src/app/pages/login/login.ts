@@ -12,7 +12,12 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.scss',
 })
 export class Login {
+
+  rpe: string = '';
+  password: string = '';
+
   mostrarPassword: boolean = false;
+  errorMensaje: string | null = null;
 
   constructor(private router: Router) { }
 
@@ -21,7 +26,16 @@ export class Login {
   }
 
   ingresar() {
-    this.router.navigate(['/gestion-incidencias']);
+    const USUARIO_VALIDO = '9XXXX';
+    const PASSWORD_VALIDO = 'cfe2026';
+
+    if (this.rpe === USUARIO_VALIDO && this.password === PASSWORD_VALIDO) {
+      this.errorMensaje = null;
+      this.router.navigate(['/gestion-incidencias']);
+    } else {
+      this.errorMensaje = 'RPE o contraseña incorrectos. Por favor, inténtalo de nuevo.';
+    }
+
   }
 
 }
