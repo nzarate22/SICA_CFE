@@ -12,7 +12,7 @@
       <div class="row g-3 align-items-end mb-4">
         <div class="col-md-3">
           <label class="form-label fw-bold">RPE:</label>
-          <input type="text" class="form-control" [(ngModel)]="rpeBusqueda" placeholder="Ej. 9NJHC">
+          <input type="text" class="form-control" [(ngModel)]="rpeBusqueda" placeholder="5 dígitos">
         </div>
 
         <div class="col-md-3">
@@ -27,7 +27,7 @@
 
         <div class="col-md-3">
           <button class="btn btn-outline-dark w-100" (click)="buscar()" [disabled]="cargando">
-            <i class="bi bi-search"></i> {{ cargando ? 'Buscando...' : 'Buscar' }}
+            <i class="bi bi-search"></i> Buscar
           </button>
         </div>
       </div>
@@ -53,4 +53,36 @@
         <tbody>
           <tr *ngFor="let evento of listaEventos">
             <td class="ps-4">{{ evento.fecha }}</td>
-            <td>{{ evento.dir === 'IN' ?
+
+            <td>{{ evento.hora_entrada }}</td>
+
+            <td>{{ evento.hora_salida !== evento.hora_entrada ? evento.hora_salida : '-' }}</td>
+
+            <td>
+              <span [ngClass]="evento.hora_entrada >= '08:01:00' ? 'text-warning fw-bold' : 'text-success'">
+                {{ evento.hora_entrada >= '08:01:00' ? 'Retardo' : 'Completo' }}
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="listaEventos.length === 0">
+            <td colspan="4" class="text-center py-5 text-muted">
+              <i class="bi bi-info-circle me-2"></i>
+              <span *ngIf="!cargando">Llene los campos para mostrar los resultados.</span>
+              <span *ngIf="cargando">Buscando en servidores de CFE...</span>
+            </td>
+          </tr>
+        </tbody>
+
+        <tfoot *ngIf="listaEventos.length > 0">
+          <tr class="table-light fw-bold border-top border-2">
+            <td colspan="3" class="text-end ps-4 py-3">TOTAL DE RETARDOS EN EL PERIODO:</td>
+            <td class="text-warning fs-5 py-3">
+              {{ totalRetardos }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
