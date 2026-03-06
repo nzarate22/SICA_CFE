@@ -26,8 +26,9 @@
         </div>
 
         <div class="col-md-3">
-          <button class="btn btn-outline-dark w-100" (click)="buscar()" [disabled]="cargando">
-            <i class="bi bi-search"></i> Buscar
+          <button class="btn btn-outline-dark w-100" (click)="buscar()">
+            <i class="bi bi-search"></i>
+            {{ cargando ? 'Buscando...' : 'Buscar' }}
           </button>
         </div>
       </div>
@@ -54,14 +55,23 @@
           <tr *ngFor="let evento of listaEventos">
             <td class="ps-4">{{ evento.fecha }}</td>
 
-            <td>{{ evento.hora_entrada }}</td>
+            <td>{{ evento.hora_entrada < '12:00:00' ? evento.hora_entrada : 'S/E' }}</td>
 
-            <td>{{ evento.hora_salida !== evento.hora_entrada ? evento.hora_salida : '-' }}</td>
-
+            <td>{{ evento.hora_salida >= '12:00:00' ? evento.hora_salida : 'S/S' }}</td>
             <td>
-              <span [ngClass]="evento.hora_entrada >= '08:01:00' ? 'text-warning fw-bold' : 'text-success'">
-                {{ evento.hora_entrada >= '08:01:00' ? 'Retardo' : 'Completo' }}
-              </span>
+              <span [ngClass]="{
+    'text-danger fw-bold': (evento.hora_entrada >= '12:00:00' || evento.hora_salida < '12:00:00' || (evento.hora_salida !== 'S/S' && evento.hora_salida < '16:00:00') || (evento.hora_entrada >= '08:01:00' && evento.hora_entrada < '12:00:00')),
+    'text-success': (evento.hora_entrada < '08:01:00' && evento.hora_salida >= '16:00:00')
+  }">
+                {{
+                (evento.hora_entrada >= '12:00:00' && evento.hora_salida < '12:00:00' ) ? 'Falta Total' :
+                  (evento.hora_entrada>= '08:01:00' && evento.hora_entrada < '12:00:00' && evento.hora_salida
+                    < '12:00:00' ) ? 'Retardo / Sin Salida' : (evento.hora_entrada>= '08:01:00' && evento.hora_entrada
+                    < '12:00:00' && evento.hora_salida < '16:00:00' ) ? 'Retardo / S. Anticipada' :
+                      (evento.hora_entrada>= '08:01:00' && evento.hora_entrada < '12:00:00' ) ? 'Retardo' :
+                        (evento.hora_entrada>= '12:00:00') ? 'Sin Entrada' :
+                        (evento.hora_salida < '12:00:00' ) ? 'Sin Salida' : (evento.hora_salida < '16:00:00' )
+                          ? 'Salida Anticipada' : 'Completo' }} </span>
             </td>
           </tr>
 

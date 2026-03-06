@@ -33,28 +33,33 @@ export class GestionIncidencias {
     }
 
     this.cargando = true;
-    this.totalRetardos = 0; 
+    this.totalRetardos = 0;
 
     this.eventoService.obtenerAsistencias(this.rpeBusqueda, this.fechaInicio, this.fechaFin).subscribe({
       next: (datos) => {
         this.listaEventos = datos;
-        this.cargando = false;
 
         if (this.listaEventos.length > 0) {
           this.nombreColaborador = this.listaEventos[0].nombre;
-          this.totalRetardos = this.listaEventos.filter(evento =>
-            evento.hora_entrada >= '08:01:00'
-          ).length;
+
+          this.totalRetardos = this.listaEventos.filter(e => {
+            return (
+              e.hora_entrada &&
+              e.hora_entrada >= '08:01:00' &&
+              e.hora_entrada < '12:00:00'
+            );
+          }).length;
 
         } else {
           this.nombreColaborador = 'No se encontraron registros';
           this.totalRetardos = 0;
         }
+
+        this.cargando = false;
       },
       error: (e) => {
-        console.error('Error al conectar con el servidor de CFE:', e);
+        console.error(e);
         this.cargando = false;
-        this.totalRetardos = 0;
       }
     });
   }
