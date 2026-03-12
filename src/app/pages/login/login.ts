@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Navbar } from '../../components/navbar/navbar';
 import { Route, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, Navbar],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -15,9 +14,9 @@ export class Login {
 
   rpe: string = '';
   password: string = '';
-
   mostrarPassword: boolean = false;
   errorMensaje: string | null = null;
+  currentYear: number = new Date().getFullYear();
 
   constructor(private router: Router) { }
 
@@ -35,7 +34,6 @@ export class Login {
     } else {
       this.errorMensaje = 'RPE o contraseña incorrectos. Por favor, inténtalo de nuevo.';
     }
-
   }
 
 }
