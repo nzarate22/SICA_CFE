@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Eventos } from '../../services/eventos';
 import { Subscription } from 'rxjs';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-gestion-incidencias',
@@ -17,7 +19,7 @@ export class GestionIncidencias {
   rpeBusqueda: string = '';
   fechaInicio: string = '';
   fechaFin: string = '';
-  nombreColaborador: string = 'Nombre del Trabajador Seleccionado';
+  nombreColaborador: string = '';
 
   listaEventos: any[] = [];
   cargando: boolean = false;
@@ -25,7 +27,6 @@ export class GestionIncidencias {
   totalSalidasAnticipadas: number = 0;
 
   private busquedaActiva?: Subscription;
-  private precargado: boolean = false;
   private idUltimaBusqueda: number = 0;
 
   constructor(
@@ -33,26 +34,8 @@ export class GestionIncidencias {
     private eventoService: Eventos
   ) { }
 
-  onRpeChange() {
-    this.precargado = false;
-    this.intentarPrecargar();
-  }
-
-  onFechaChange() {
-    this.precargado = false;
-    this.intentarPrecargar();
-  }
-
-  private intentarPrecargar() {
-    if (this.rpeBusqueda.length >= 3 && this.fechaInicio && this.fechaFin && !this.precargado) {
-      this.precargado = true;
-      this.eventoService.obtenerAsistencias(
-        this.rpeBusqueda,
-        this.fechaInicio,
-        this.fechaFin
-      ).subscribe({ next: () => { }, error: () => { } });
-    }
-  }
+  onRpeChange() { }
+  onFechaChange() { }
 
   buscar() {
     if (!this.rpeBusqueda || !this.fechaInicio || !this.fechaFin) {
@@ -90,6 +73,23 @@ export class GestionIncidencias {
           this.cargando = false;
         }
       });
+  }
+
+  limpiar() {
+    this.rpeBusqueda = '';
+    this.fechaInicio = '';
+    this.fechaFin = '';
+    this.listaEventos = [];
+    this.nombreColaborador = '';
+    this.totalRetardos = 0;
+    this.totalSalidasAnticipadas = 0;
+
+    if (this.busquedaActiva) {
+      this.busquedaActiva.unsubscribe();
+      this.busquedaActiva = undefined;
+    }
+
+    this.cargando = false;
   }
 
   private procesarDatos(datos: any[]) {
@@ -137,8 +137,8 @@ export class GestionIncidencias {
     if (entrada === -1) return 'S/E';
     if (salida === -1) return 'S/S';
 
-    if (entrada < medioDia && salida < medioDia) return 'S/S'; 
-    if (entrada >= medioDia && salida >= medioDia) return 'S/E'; 
+    if (entrada < medioDia && salida < medioDia) return 'S/S';
+    if (entrada >= medioDia && salida >= medioDia) return 'S/E';
 
     if (entrada >= inicioRetardo && salida < horaSalida) return 'Retardo / S. Anticipada';
     if (entrada >= inicioRetardo) return 'Retardo';
@@ -146,7 +146,80 @@ export class GestionIncidencias {
     return 'Completo';
   }
 
+  generarReporte() {
+    const doc = new jsPDF();
+    const img = new Image();
+    img.src = 'images/logo-cfe.png';
+
+    img.onload = () => {
+      doc.addImage(img, 'PNG', 155, 10, 40, 18);
+
+      doc.setFontSize(18);
+      doc.setTextColor(0, 130, 70);
+      doc.text('SICA-CFE', 14, 20);
+
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text('Sistema de Control de Asistencias CFE', 14, 27);
+
+      doc.setDrawColor(0, 130, 70);
+      doc.setLineWidth(0.5);
+      doc.line(14, 30, 196, 30);
+
+      doc.setFontSize(11);
+      doc.setTextColor(0);
+      doc.text(`Colaborador: ${this.nombreColaborador}`, 14, 40);
+      doc.text(`RPE: ${this.rpeBusqueda}`, 14, 47);
+      doc.text(`Periodo: ${this.fechaInicio} al ${this.fechaFin}`, 14, 54);
+
+      autoTable(doc, {
+        startY: 62,
+        head: [['Fecha', 'Entrada', 'Salida', 'Estatus']],
+        body: this.listaEventos.map(e => [
+          e.fecha,
+          e.estatus === 'S/E' ? '-' : e.hora_entrada ? e.hora_entrada.substring(0, 8) : '-',
+          e.estatus === 'S/S' ? '-' : e.hora_salida ? e.hora_salida.substring(0, 8) : '-',
+          e.estatus
+        ]),
+        headStyles: {
+          fillColor: [0, 130, 70],
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+          fillColor: [240, 248, 240]
+        },
+        didParseCell: (data) => {
+          if (data.section === 'body' && data.column.index === 3) {
+            const estatus = data.cell.raw as string;
+            if (estatus === 'Completo') {
+              data.cell.styles.textColor = [0, 150, 50];
+            } else {
+              data.cell.styles.textColor = [200, 0, 0];
+            }
+          }
+        }
+      });
+
+      const finalY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(11);
+      doc.setTextColor(0);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Total de Retardos en el Periodo: ${this.totalRetardos}`, 14, finalY);
+      doc.text(`Salidas Anticipadas en el Periodo: ${this.totalSalidasAnticipadas}`, 14, finalY + 8);
+
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generado el ${new Date().toLocaleDateString('es-MX')} a las ${new Date().toLocaleTimeString('es-MX')}`, 14, 290);
+
+      doc.save(`Reporte_${this.rpeBusqueda}_${this.fechaInicio}_${this.fechaFin}.pdf`);
+    };
+  }
+
   cerrarSesion() {
-    this.router.navigate(['/login']);
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+      this.router.navigate(['/login']);
+    }
   }
 }

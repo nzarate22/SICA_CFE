@@ -1,37 +1,47 @@
 <app-navbar></app-navbar>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 px-4">
 
-  <div class="d-flex justify-content-end mb-4">
-    <button (click)="cerrarSesion()" class="btn btn-cerrar-sica shadow-sm fw-bold">
-      <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+  <!-- Botón cerrar sesión -->
+  <div class="d-flex justify-content-end mb-3">
+    <button (click)="cerrarSesion()" class="btn btn-cerrar fw-bold">
+      <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
     </button>
   </div>
 
-  <div class="card shadow-sm mb-4 border-success-cfe">
-    <div class="card-body">
-      <div class="row g-3 align-items-end mb-4">
+  <!-- Filtros de búsqueda -->
+  <div class="card shadow-sm mb-4 filtros-card">
+    <div class="card-body py-3">
+      <div class="row g-3 align-items-end">
 
         <div class="col-md-3">
-          <label class="form-label fw-bold">RPE:</label>
-          <input type="text" class="form-control" [(ngModel)]="rpeBusqueda" placeholder="5 dígitos"
-            (ngModelChange)="onRpeChange()">
+          <label class="form-label fw-bold text-dark">RPE / RTE</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-person text-success"></i>
+            </span>
+            <input type="text" class="form-control border-start-0 ps-0" [(ngModel)]="rpeBusqueda"
+              placeholder="Ej. 9XXXX" (ngModelChange)="onRpeChange()">
+          </div>
         </div>
 
         <div class="col-md-3">
-          <label class="form-label fw-bold">Desde:</label>
+          <label class="form-label fw-bold text-dark">Desde</label>
           <input type="date" class="form-control" [(ngModel)]="fechaInicio" (ngModelChange)="onFechaChange()">
         </div>
 
         <div class="col-md-3">
-          <label class="form-label fw-bold">Hasta:</label>
+          <label class="form-label fw-bold text-dark">Hasta</label>
           <input type="date" class="form-control" [(ngModel)]="fechaFin" (ngModelChange)="onFechaChange()">
         </div>
 
-        <div class="col-md-3">
-          <button class="btn btn-outline-dark w-100" (click)="buscar()">
-            <i class="bi bi-search"></i>
+        <div class="col-md-3 d-flex gap-2">
+          <button class="btn btn-buscar w-100 fw-bold" (click)="buscar()">
+            <i class="bi bi-search me-1"></i>
             {{ cargando ? 'Buscando...' : 'Buscar' }}
+          </button>
+          <button class="btn btn-limpiar fw-bold" (click)="limpiar()" *ngIf="listaEventos.length > 0 || rpeBusqueda">
+            <i class="bi bi-x-lg"></i>
           </button>
         </div>
 
@@ -39,30 +49,32 @@
     </div>
   </div>
 
-  <div class="mb-3 px-2">
-    <span class="fs-5 fw-bold text-dark">Colaborador:</span>
-    <span class="fs-5 ms-2 text-secondary">
-      {{ nombreColaborador }}
+  <!-- Colaborador -->
+  <div class="mb-3 px-1 d-flex align-items-center gap-2" *ngIf="listaEventos.length > 0">
+    <span class="fs-5 fw-bold text-dark">{{ nombreColaborador }}</span>
+    <span class="badge bg-success-subtle text-success border border-success-subtle ms-1">
+      {{ rpeBusqueda }}
     </span>
   </div>
 
-  <div class="card shadow-sm mb-4">
+  <!-- Tabla -->
+  <div class="card shadow-sm mb-3">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
 
-        <thead class="table-light">
-          <tr>
-            <th class="ps-4">Fecha</th>
-            <th>Entrada</th>
-            <th>Salida</th>
-            <th>Estatus</th>
+        <thead>
+          <tr class="tabla-header">
+            <th class="ps-4">FECHA</th>
+            <th>ENTRADA</th>
+            <th>SALIDA</th>
+            <th>ESTATUS</th>
           </tr>
         </thead>
 
         <tbody>
 
           <tr *ngFor="let evento of listaEventos">
-            <td class="ps-4">{{ evento.fecha }}</td>
+            <td class="ps-4 text-muted">{{ evento.fecha }}</td>
 
             <td>
               {{ evento.estatus === 'S/E' ? '-' : evento.hora_entrada ? evento.hora_entrada.substring(0,8) : '-' }}
@@ -74,9 +86,9 @@
 
             <td>
               <span [ngClass]="{
-                  'text-danger fw-bold': evento.estatus !== 'Completo',
-                  'text-success': evento.estatus === 'Completo'
-                }">
+                'estatus-completo':   evento.estatus === 'Completo',
+                'estatus-incidencia': evento.estatus !== 'Completo'
+              }">
                 {{ evento.estatus }}
               </span>
             </td>
@@ -84,43 +96,37 @@
 
           <tr *ngIf="listaEventos.length === 0">
             <td colspan="4" class="text-center py-5 text-muted">
-              <i class="bi bi-info-circle me-2"></i>
-              <span *ngIf="!cargando">Llene los campos para mostrar los resultados.</span>
-              <span *ngIf="cargando">Buscando en servidores de CFE...</span>
+              <i class="bi bi-search me-2 fs-5"></i>
+              <span *ngIf="!cargando" class="d-block mt-2">Ingrese los datos para buscar asistencias.</span>
+              <span *ngIf="cargando" class="d-block mt-2">Buscando en servidores de CFE...</span>
             </td>
           </tr>
 
         </tbody>
 
         <tfoot *ngIf="listaEventos.length > 0">
-
-          <tr class="table-light fw-bold border-top border-2">
-            <td colspan="3" class="text-end ps-4 py-3">
+          <tr class="totales-row">
+            <td colspan="3" class="text-end ps-4 py-3 fw-bold">
               TOTAL DE RETARDOS EN EL PERIODO:
             </td>
-            <td class="text-dark fs-5 py-3">
-              {{ totalRetardos }}
-            </td>
+            <td class="py-3 fw-bold fs-5">{{ totalRetardos }}</td>
           </tr>
-
-          <tr class="table-light fw-bold">
-            <td colspan="3" class="text-end ps-4 py-3">
+          <tr class="totales-row">
+            <td colspan="3" class="text-end ps-4 py-3 fw-bold">
               SALIDAS ANTICIPADAS EN EL PERIODO:
             </td>
-            <td class="text-dark fs-5 py-3">
-              {{ totalSalidasAnticipadas }}
-            </td>
+            <td class="py-3 fw-bold fs-5">{{ totalSalidasAnticipadas }}</td>
           </tr>
-
         </tfoot>
 
       </table>
     </div>
   </div>
 
+  <!-- Botón generar reporte -->
   <div class="d-flex justify-content-end mt-2" *ngIf="listaEventos.length > 0">
-    <button class="btn btn-success fw-bold shadow-sm">
-      <i class="bi bi-file-earmark-text me-2"></i>Generar Reporte
+    <button class="btn btn-reporte fw-bold shadow-sm" (click)="generarReporte()">
+      <i class="bi bi-file-earmark-pdf me-2"></i>Generar Reporte PDF
     </button>
   </div>
 

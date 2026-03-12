@@ -1,37 +1,60 @@
-<app-navbar></app-navbar>
+<div class="login-wrapper">
 
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-lg rounded-4 border-success-cfe" style="width: 100%; max-width: 400px;">
-        <div class="card-body p-4">
-            <h3 class="text-center mb-4 fw-bold">Acceso SICA</h3>
+    <div class="login-card">
 
-            <div *ngIf="errorMensaje" class="alert alert-danger py-2 shadow-sm border-0 mb-3" role="alert">
+        <div class="login-header">
+            <img src="images/logo-cfe.png" alt="CFE" class="login-logo">
+            <h4 class="login-title">SICA-CFE</h4>
+            <p class="login-subtitle">Sistema de Control de Asistencias</p>
+        </div>
+
+        <div class="login-body">
+
+            <div *ngIf="errorMensaje" class="alert alert-danger py-2 border-0 shadow-sm mb-3" role="alert">
                 <i class="bi bi-exclamation-circle-fill me-2"></i> {{ errorMensaje }}
             </div>
 
             <form (ngSubmit)="ingresar()">
+
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">RPE / RTE:</label>
-                    <input type="text" class="form-control" placeholder="Ej. 9XXXX" name="rpe" [(ngModel)]="rpe"
-                        (input)="errorMensaje = null" required>
+                    <label class="form-label fw-semibold text-muted small">RPE:</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-person text-success"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Ej. 9XXXX" name="rpe"
+                            [(ngModel)]="rpe" (input)="errorMensaje = null" required>
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-semibold">Contraseña:</label>
+                    <label class="form-label fw-semibold text-muted small">Contraseña:</label>
                     <div class="input-group">
-                        <input [type]="mostrarPassword ? 'text' : 'password'" class="form-control" name="password"
-                            placeholder="••••••••" [(ngModel)]="password" (input)="errorMensaje = null" required>
-                        <button (click)="togglePassword()" class="btn btn-outline-secondary" type="button">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-lock text-success"></i>
+                        </span>
+                        <input [type]="mostrarPassword ? 'text' : 'password'"
+                            class="form-control border-start-0 ps-0 border-end-0" name="password" placeholder="••••••••"
+                            [(ngModel)]="password" (input)="errorMensaje = null" required>
+                        <button (click)="togglePassword()" class="btn btn-outline-secondary border-start-0 bg-white"
+                            type="button">
                             <i class="bi" [ngClass]="mostrarPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success-cfe w-100 fw-bold shadow-sm"
-                    [disabled]="!rpe || !password">
-                    Ingresar
+                <button type="submit" class="btn-login w-100 fw-bold shadow-sm" [disabled]="!rpe || !password">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
                 </button>
+
             </form>
+
         </div>
+
+        <div class="login-footer">
+            <span>© {{ currentYear }} Comisión Federal de Electricidad</span>
+        </div>
+
     </div>
+
 </div>
