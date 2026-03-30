@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Route, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
@@ -16,24 +17,38 @@ export class Login {
   password: string = '';
   mostrarPassword: boolean = false;
   errorMensaje: string | null = null;
+  cargando: boolean = false;
   currentYear: number = new Date().getFullYear();
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private authService: Auth
+  ) { }
 
   togglePassword() {
     this.mostrarPassword = !this.mostrarPassword;
   }
 
   ingresar() {
-    const USUARIO_VALIDO = '9XXXX';
-    const PASSWORD_VALIDO = 'cfe2026';
+    if (!this.rpe || !this.password) return;
 
-    if (this.rpe === USUARIO_VALIDO && this.password === PASSWORD_VALIDO) {
-      this.errorMensaje = null;
-      this.router.navigate(['/gestion-incidencias']);
-    } else {
-      this.errorMensaje = 'RPE o contraseña incorrectos. Por favor, inténtalo de nuevo.';
-    }
+    this.cargando = true;
+    this.errorMensaje = null;
+
+    this.authService.login(this.rpe, this.password).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.router.navigate(['/gestion-incidencias']);
+        } else {
+          this.errorMensaje = res.message || 'RPE o contraseña incorrectos.';
+        }
+        this.cargando = false;
+      },
+      error: () => {
+        this.errorMensaje = 'Error al conectar con el servidor.';
+        this.cargando = false;
+      }
+    });
   }
 
 }

@@ -1,10 +1,8 @@
-// Card de filtros
 .filtros-card {
     border: 1px solid #ccc;
     border-top: 1.5px solid #000;
 }
 
-// Card de tabla
 .card {
     border: 1px solid #ccc;
     border-top: 1.5px solid #000;
@@ -23,7 +21,6 @@
     }
 }
 
-// Botón buscar
 .btn-buscar {
     background-color: #008248;
     color: white;
@@ -43,7 +40,6 @@
     }
 }
 
-// Botón limpiar
 .btn-limpiar {
     background-color: white;
     color: #888;
@@ -64,7 +60,6 @@
     }
 }
 
-// Botón cerrar sesión
 .btn-cerrar {
     background-color: white;
     color: #555;
@@ -84,7 +79,6 @@
     }
 }
 
-// Cabecera de tabla
 .tabla-header th {
     background-color: #f8f8f8;
     color: #000;
@@ -96,7 +90,6 @@
     letter-spacing: 0.5px;
 }
 
-// Estatus sin fondo
 .estatus-completo {
     color: #2e7d32;
     font-weight: 500;
@@ -107,19 +100,16 @@
     font-weight: 500;
 }
 
-// Sin hover en filas
 .table-hover tbody tr:hover {
     background-color: #f9f9f9;
 }
 
-// Filas de totales
 .totales-row td {
     background-color: #f8f8f8;
     border-top: 1px solid #ddd;
     font-size: 0.9rem;
 }
 
-// Botón generar reporte
 .btn-reporte {
     background-color: #1565c0;
     color: white;
