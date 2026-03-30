@@ -174,11 +174,12 @@ export class GestionIncidencias {
 
       autoTable(doc, {
         startY: 62,
-        head: [['Fecha', 'Entrada', 'Salida', 'Estatus']],
+        head: [['Fecha', 'Entrada', 'Salida', 'Dispositivo', 'Estatus']],
         body: this.listaEventos.map(e => [
           e.fecha,
           e.estatus === 'S/E' ? '-' : e.hora_entrada ? e.hora_entrada.substring(0, 8) : '-',
           e.estatus === 'S/S' ? '-' : e.hora_salida ? e.hora_salida.substring(0, 8) : '-',
+          e.disp ?? '-',
           e.estatus
         ]),
         headStyles: {
@@ -190,7 +191,7 @@ export class GestionIncidencias {
           fillColor: [240, 248, 240]
         },
         didParseCell: (data) => {
-          if (data.section === 'body' && data.column.index === 3) {
+          if (data.section === 'body' && data.column.index === 4) {
             const estatus = data.cell.raw as string;
             if (estatus === 'Completo') {
               data.cell.styles.textColor = [0, 150, 50];

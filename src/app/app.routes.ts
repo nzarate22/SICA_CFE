@@ -6,5 +6,5 @@ export const routes: Routes = [
     {path: 'login', component:Login},
     {path: 'gestion-incidencias',component: GestionIncidencias},
     {path: '', redirectTo: 'login', pathMatch: 'full'}, //LA URL VACÍA MANDA AL LOGIN
-    {path:'**', redirectTo: 'login'} //PARA INGRESAR A CUALQUIER OTRA PAGINA MANDA AL LOGIN(SEGURIDAD)
+    {path:'**', redirectTo: 'login'} //PARA INGRESAR A CUALQUIER OTRA PAGINA MANDA AL LOGIN
 ];
