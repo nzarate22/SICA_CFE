@@ -1,0 +1,184 @@
+<div class="container my-5 animate__animated animate__fadeIn">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-success m-0" style="color: #007A33 !important;">
+                <i class="bi bi-shield-check me-2"></i>Panel de Control de Usuarios
+            </h2>
+            <p class="text-muted m-0 small mt-1">Módulo exclusivo de administración para TICS y Recursos Humanos.</p>
+        </div>
+        <button class="btn btn-outline-secondary fw-semibold dm-btn" routerLink="/menu-principal">
+            <i class="bi bi-arrow-left me-1"></i> Volver al Menú
+        </button>
+    </div>
+
+    <div *ngIf="msgExito" class="alert alert-success alert-dismissible fade show shadow-sm py-2 small mb-3"
+        role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ msgExito }}
+    </div>
+    <div *ngIf="msgError" class="alert alert-danger alert-dismissible fade show shadow-sm py-2 small mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ msgError }}
+    </div>
+
+    <div *ngIf="cargando" class="text-center my-5">
+        <div class="spinner-border text-success" role="status"></div>
+        <p class="text-muted small mt-2">Sincronizando base de datos local...</p>
+    </div>
+
+    <div *ngIf="!cargando">
+
+        <div class="card shadow-sm border-0 rounded-3 mb-5 bg-white card-adm">
+            <div class="card-header py-3 border-0 rounded-top-3 d-flex align-items-center header-solicitudes">
+                <i class="bi bi-clock-history fs-5 me-2"></i>
+                <h5 class="m-0 fw-bold">Solicitudes Pendientes de Confirmación</h5>
+                <span class="badge bg-warning text-dark ms-2 fw-bold badge-count">{{ solicitudes.length }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div *ngIf="solicitudes.length === 0" class="text-center py-4 text-muted small">
+                    No hay solicitudes de registro pendientes por el momento.
+                </div>
+                <div *ngIf="solicitudes.length > 0" class="table-responsive">
+                    <table class="table table-hover align-middle m-0 text-center small">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 20%;">RPE</th>
+                                <th style="width: 50%; text-align: left;" class="ps-4">Nombre Completo</th>
+                                <th style="width: 30%;">Acciones de Autorización</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let sol of solicitudes">
+                                <td class="fw-bold text-dark">{{ sol.rpe }}</td>
+                                <td class="text-secondary text-start ps-4">{{ sol.nombre }}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm fw-semibold me-2 px-3"
+                                        (click)="evaluarSolicitud(sol.id, 'aceptar')">
+                                        <i class="bi bi-person-check-fill me-1"></i> Aceptar
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm fw-semibold px-3"
+                                        (click)="evaluarSolicitud(sol.id, 'rechazar')">
+                                        <i class="bi bi-person-x-fill me-1"></i> Rechazar
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-3 bg-white card-adm">
+            <div
+                class="card-header text-white py-3 border-0 rounded-top-3 d-flex align-items-center header-activos justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-person-vcard fs-5 me-2"></i>
+                    <h5 class="m-0 fw-bold">Personal Activo Registrado en el SICA</h5>
+                    <span class="badge bg-white text-success ms-2 fw-bold badge-count"
+                        style="color: #007A33 !important;">
+                        {{ usuariosFiltrados.length }}
+                    </span>
+                </div>
+
+                <div style="max-width: 240px; width: 100%;">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i
+                                class="bi bi-search"></i></span>
+                        <input type="text" [(ngModel)]="terminoBusqueda" class="form-control border-start-0"
+                            placeholder="Buscar por RPE o Nombre...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <div *ngIf="usuariosActivos.length === 0" class="text-center py-4 text-muted small">
+                    No hay usuarios registrados en el sistema local.
+                </div>
+
+                <div *ngIf="usuariosActivos.length > 0" class="table-responsive">
+                    <table class="table table-hover align-middle m-0 text-center small">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 10%;">RPE</th>
+                                <th style="width: 25%; text-align: left;" class="ps-4">Nombre Completo</th>
+                                <th style="width: 15%;">Rol / Privilegio</th>
+                                <th style="width: 15%;">Archivo Responsiva</th>
+                                <th style="width: 15%;">Vigencia (1 Año)</th>
+                                <th style="width: 20%;">Operaciones del Sistema</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let user of usuariosFiltrados"
+                                [ngClass]="{'table-secondary text-muted': user.activo === 0}">
+                                <td class="fw-bold">{{ user.rpe }}</td>
+                                <td class="text-start ps-4">
+                                    {{ user.nombre }}
+                                    <span *ngIf="user.activo === 0"
+                                        class="badge bg-secondary text-white ms-2">Inactivo</span>
+                                </td>
+
+                                <td>
+                                    <select
+                                        class="form-select form-select-sm text-center fw-semibold select-rol mx-auto"
+                                        [disabled]="user.activo === 0" [ngModel]="user.rol"
+                                        (ngModelChange)="actualizarRol(user.id, $event)" style="max-width: 150px;">
+                                        <option value="usuario">Usuario General</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <span *ngIf="user.constancia_status === 'Pendiente'"
+                                        class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                        <i class="bi bi-file-earmark-x me-1"></i> Pendiente
+                                    </span>
+                                    <button *ngIf="user.constancia_status === 'Completada'"
+                                        class="btn btn-link p-0 fw-bold text-success text-decoration-none small d-inline-block"
+                                        (click)="verDocumento(user.constancia_archivo)">
+                                        <span
+                                            class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 btn-ver-doc">
+                                            <i class="bi bi-file-earmark-check-fill me-1"></i> Completada (Ver)
+                                        </span>
+                                    </button>
+                                </td>
+
+                                <td>
+                                    <span class="badge px-2 py-1 border small"
+                                        [ngClass]="calcularVigenciaResponsiva(user.fecha_subida_responsiva).clase">
+                                        <i class="bi bi-shield-fill-exclamation me-1"></i>
+                                        {{ calcularVigenciaResponsiva(user.fecha_subida_responsiva).texto }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-sm px-2 py-1 fw-semibold"
+                                            [ngClass]="user.activo === 1 ? 'btn-outline-warning text-dark' : 'btn-warning text-dark'"
+                                            (click)="cambiarEstatusActivacion(user)">
+                                            <i class="bi"
+                                                [ngClass]="user.activo === 1 ? 'bi-person-dash-fill me-1' : 'bi-person-plus-fill me-1'"></i>
+                                            {{ user.activo === 1 ? 'Deshabilitar' : 'Habilitar' }}
+                                        </button>
+
+                                        <button class="btn btn-outline-danger btn-sm px-2 py-1 btn-eliminar-user"
+                                            (click)="darDeBajaUsuario(user.id, user.nombre)">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr *ngIf="usuariosFiltrados.length === 0">
+                                <td colspan="6" class="text-center text-muted py-4 small">
+                                    <i class="bi bi-person-x-fill me-1 fs-5 d-block mb-1 text-danger"></i>
+                                    No se encontró personal activo registrado con el criterio: <strong>"{{
+                                        terminoBusqueda }}"</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,130 @@
+<div class="container my-5 animate__animated animate__fadeIn">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-success m-0" style="color: #007A33 !important;">
+                <i class="bi bi-pencil-square me-2"></i>Catálogo de Firmas Autorizadas (SICA)
+            </h2>
+            <p class="text-muted m-0 small mt-1">Configuración aislada de Jefaturas y Responsables Técnicos para el
+                cuadro del PDF.</p>
+        </div>
+        <button class="btn btn-outline-secondary fw-semibold dm-btn" routerLink="/menu-principal">
+            <i class="bi bi-arrow-left me-1"></i> Volver al Menú
+        </button>
+    </div>
+
+    <div *ngIf="msgExito" class="alert alert-success small py-2 mb-3 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ msgExito }}
+    </div>
+    <div *ngIf="msgError" class="alert alert-danger small py-2 mb-3 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ msgError }}
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3 mb-4 bg-white">
+        <div class="card-header bg-light fw-bold text-dark border-0 py-3">
+            <i class="bi bi-person-plus-fill me-2 text-success"></i> Registrar Autorizador / Firmante Institucional
+        </div>
+        <div class="card-body">
+            <form (ngSubmit)="registrarNuevoFirmante()" #firmaForm="ngForm" class="row g-3 align-items-end">
+
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold text-muted">RPE:</label>
+                    <input type="text" [(ngModel)]="nuevoRpe" name="rpe" class="form-control form-control-sm"
+                        placeholder="Ej. 9XXXX" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-muted">Nombre Completo:</label>
+                    <input type="text" [(ngModel)]="nuevoNombre" name="nombre" class="form-control form-control-sm"
+                        placeholder="Ej. Ing. Gerardo Pérez" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-muted">Cargo / Puesto Estructural CFE:</label>
+                    <input type="text" [(ngModel)]="nuevoCargo" name="cargo" class="form-control form-control-sm"
+                        placeholder="Ej. Jefe de Oficina de Operación Zona Xalapa" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-muted">Rol en el Documento:</label>
+                    <select [(ngModel)]="nuevoTipo" name="puesto_tipo" class="form-select form-select-sm text-secondary"
+                        required>
+                        <option value="" disabled selected>Seleccione el alcance...</option>
+                        <option value="1">JEFE DE DEPARTAMENTO DE RECURSOS HUMANOS</option>
+                        <option value="2">RESPONSABLE TÉCNICO TIC´S</option>
+                        <option value="3">JEFE DIRECTO</option>
+                    </select>
+                </div>
+
+                <div class="col-12 text-end mt-3">
+                    <button type="submit" [disabled]="!firmaForm.valid || cargando"
+                        class="btn btn-success btn-sm px-4 fw-bold shadow-sm"
+                        style="background-color: #007A33 !important; border: none;">
+                        <i class="bi bi-plus-circle me-1"></i> Guardar Firmante
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3 bg-white">
+        <div class="card-header text-white py-3 border-0 rounded-top-3 d-flex align-items-center justify-content-between"
+            style="background-color: #1E3020 !important;">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-table fs-5 me-2"></i>
+                <h5 class="m-0 fw-bold">Jerarquías de Validación Registradas</h5>
+                <span class="badge bg-white text-dark ms-2 fw-bold">{{ listaFirmantes.length }}</span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div *ngIf="cargando" class="text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="text-muted small mt-2">Consultando archivo independiente firmas.db...</p>
+            </div>
+
+            <div *ngIf="!cargando && listaFirmantes.length === 0" class="text-center py-4 text-muted small">
+                El catálogo de firmas se encuentra vacío. Registre autorizadores en el formulario superior.
+            </div>
+
+            <div *ngIf="!cargando && listaFirmantes.length > 0" class="table-responsive">
+                <table class="table table-hover align-middle m-0 text-center small">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 15%;">RPE</th>
+                            <th style="width: 25%; text-align: left;" class="ps-4">Nombre Oficial</th>
+                            <th style="width: 35%; text-align: left;">Cargo o Puesto de Adscripción</th>
+                            <th style="width: 15%;">Clasificación</th>
+                            <th style="width: 10%;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let f of listaFirmantes">
+                            <td class="fw-bold text-dark">{{ f.rpe }}</td>
+                            <td class="text-start ps-4 fw-semibold">{{ f.nombre }}</td>
+                            <td class="text-start text-secondary small">{{ f.cargo }}</td>
+
+                            <td>
+                                <span class="badge px-2 py-1 border text-uppercase" [ngClass]="{
+    'bg-danger-subtle text-danger border-danger-subtle': f.puesto_tipo === '1',
+    'bg-info-subtle text-info border-info-subtle': f.puesto_tipo === '2',
+    'bg-success-subtle text-success border-success-subtle': f.puesto_tipo === '3'
+}">
+                                    {{ f.puesto_tipo === '1' ? 'Recursos Humanos' :
+                                    f.puesto_tipo === '2' ? 'Técnico TICS' : 'Jefe Inmediato' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <button class="btn btn-outline-danger btn-sm py-0 px-2"
+                                    (click)="darDeBajaFirmante(f.id, f.nombre)">
+                                    <i class="bi bi-trash3-fill small"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

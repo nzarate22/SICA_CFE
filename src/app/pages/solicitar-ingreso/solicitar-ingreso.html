@@ -1,0 +1,127 @@
+<div class="d-flex align-items-center justify-content-center min-vh-100 bg-light p-3">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden" style="max-width: 480px; width: 100%;">
+
+        <div class="bg-success text-white text-center p-4" style="background-color: #007A33 !important;">
+            <div class="mb-2">
+                <img src="images/logo-cfe.png" alt="CFE" style="max-height: 50px;" onerror="this.style.display='none'">
+            </div>
+            <h3 class="fw-bold m-0 fs-4">SICA-CFE</h3>
+            <small class="text-white-50">Solicitud de Alta de Cuenta Local</small>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div *ngIf="msgError" class="alert alert-danger d-flex align-items-center small py-2 mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ msgError }}
+            </div>
+            <div *ngIf="msgExito" class="alert alert-success d-flex align-items-center small py-2 mb-3" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> {{ msgExito }}
+            </div>
+
+            <form (ngSubmit)="procesarRegistro()" #registroForm="ngForm">
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">RPE:</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted small">
+                            <i class="bi bi-person text-success"></i>
+                        </span>
+                        <input type="text" name="rpe" [(ngModel)]="rpe"
+                            class="form-gradient form-control border-start-0 small" placeholder="Ej. 9XXXX" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">Nombre Completo:</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted small">
+                            <i class="bi bi-card-text text-success"></i>
+                        </span>
+                        <input type="text" name="nombre" [(ngModel)]="nombre"
+                            class="form-gradient form-control border-start-0 small" placeholder="Nombre completo"
+                            required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">Definir Contraseña:</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted small">
+                            <i class="bi bi-lock text-success"></i>
+                        </span>
+                        <input [type]="hidePassword1 ? 'password' : 'text'" name="password_1" [(ngModel)]="password_1"
+                            class="form-gradient form-control border-start-0 border-end-0 small"
+                            placeholder="Contraseña segura" required>
+                        <button class="input-group-text bg-white border-start-0 text-muted" type="button"
+                            (click)="hidePassword1 = !hidePassword1">
+                            <i class="bi" [ngClass]="hidePassword1 ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-text text-muted mt-1 ps-1" style="font-size: 0.75rem; line-height: 1.2;">
+                        <i class="bi bi-info-circle text-success me-1"></i>
+                        Debe contener mínimo 8 caracteres, letras mayúsculas, minúsculas, números y al menos un carácter
+                        especial.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">Confirmar Contraseña:</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted small">
+                            <i class="bi bi-lock-check text-success"></i>
+                        </span>
+                        <input [type]="hidePassword2 ? 'password' : 'text'" name="password_2" [(ngModel)]="password_2"
+                            class="form-gradient form-control border-start-0 border-end-0 small"
+                            placeholder="Repita la contraseña" required>
+                        <button class="input-group-text bg-white border-start-0 text-muted" type="button"
+                            (click)="hidePassword2 = !hidePassword2">
+                            <i class="bi" [ngClass]="hidePassword2 ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold text-muted mb-1">
+                        Jefe Directo:
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted small">
+                            <i class="bi bi-person-check text-success"></i>
+                        </span>
+                        <select class="form-select small border-start-0 text-secondary" [(ngModel)]="jefeSeleccionado"
+                            name="jefeSeleccionado" required>
+                            <option value="" disabled selected>
+                                Seleccione a su superior directo...
+                            </option>
+                            <option *ngFor="let jefe of listaJefes" [value]="jefe.nombre">
+                                {{ jefe.nombre }} — {{ jefe.cargo }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    [disabled]="!registroForm.valid || password_1 !== password_2 || !jefeSeleccionado || cargando"
+                    class="btn btn-registro w-100 fw-bold py-2 shadow-sm border-0 mb-3 text-white"
+                    style="background-color: #007A33 !important;">
+                    <span *ngIf="!cargando">
+                        <i class="bi bi-cloud-arrow-down-fill me-1"></i> Enviar Solicitud y Descargar Responsiva
+                    </span>
+                    <span *ngIf="cargando" class="spinner-border spinner-border-sm" role="status"></span>
+                </button>
+
+                <div class="text-center">
+                    <a routerLink="/login" class="small text-decoration-none text-success fw-semibold">
+                        <i class="bi bi-arrow-left"></i> Regresar al Inicio de Sesión
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="bg-light text-center py-3 border-top text-muted small">
+            © 2026 Comisión Federal de Electricidad
+        </div>
+    </div>
+</div>

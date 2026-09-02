@@ -1,0 +1,21 @@
+.upload-zone {
+    border-color: #dee2e6 !important;
+    background-color: #f8f9fa;
+    transition: all 0.25s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+        border-color: #008248 !important;
+        background-color: #f1fcf5;
+    }
+}
+
+.upload-zone.dragging {
+    border-color: #008248 !important;
+    background-color: #e8f5e9 !important;
+    transform: scale(1.01);
+}
+
+.letter-spacing {
+    letter-spacing: 0.8px;
+}

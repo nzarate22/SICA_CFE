@@ -1,7 +1,5 @@
 <div class="login-wrapper">
-
     <div class="login-card">
-
         <div class="login-header">
             <img src="images/logo-cfe.png" alt="CFE" class="login-logo">
             <h4 class="login-title">SICA-CFE</h4>
@@ -9,13 +7,12 @@
         </div>
 
         <div class="login-body">
-
             <div *ngIf="errorMensaje" class="alert alert-danger py-2 border-0 shadow-sm mb-3" role="alert">
                 <i class="bi bi-exclamation-circle-fill me-2"></i> {{ errorMensaje }}
             </div>
 
             <form (ngSubmit)="ingresar()">
-
+                <!-- Campo RPE -->
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-muted small">RPE:</label>
                     <div class="input-group">
@@ -27,7 +24,7 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-2">
                     <label class="form-label fw-semibold text-muted small">Contraseña:</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0">
@@ -43,20 +40,28 @@
                     </div>
                 </div>
 
+                <div class="text-center mb-4">
+                    <a routerLink="/recuperar-password" class="text-decoration-none text-success small fw-medium">
+                        Recuperar contraseña
+                    </a>
+                </div>
+
+                <div class="text-center mb-4">
+                    <a routerLink="/solicitar-ingreso" class="text-decoration-none text-success small fw-medium">
+                        Crear cuenta
+                    </a>
+                </div>
+
                 <button type="submit" class="btn-login w-100 fw-bold shadow-sm"
                     [disabled]="!rpe || !password || cargando">
                     <i class="bi bi-box-arrow-in-right me-2"></i>
                     {{ cargando ? 'Verificando...' : 'Ingresar' }}
                 </button>
-
             </form>
-
         </div>
 
         <div class="login-footer">
             <span>© {{ currentYear }} Comisión Federal de Electricidad</span>
         </div>
-
     </div>
-
 </div>

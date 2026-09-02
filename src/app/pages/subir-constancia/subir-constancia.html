@@ -1,0 +1,137 @@
+<div class="container my-5 animate__animated animate__fadeIn">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-success m-0" style="color: #007A33 !important;">
+                <i class="bi bi-file-earmark-arrow-up me-2"></i>Responsiva de Personal
+            </h2>
+            <p class="text-muted m-0 small mt-1">Suba y gestione su documentación oficial requerida por el SICA.</p>
+        </div>
+        <button class="btn btn-outline-secondary fw-semibold" routerLink="/menu-principal">
+            <i class="bi bi-arrow-left me-1"></i> Volver al Menú
+        </button>
+    </div>
+
+    <div *ngIf="msgExito" class="alert alert-success shadow-sm py-2 small mb-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ msgExito }}
+    </div>
+    <div *ngIf="msgError" class="alert alert-danger shadow-sm py-2 small mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ msgError }}
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100">
+
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+                    <h5 class="fw-bold m-0 text-dark">Cargar Nuevo Documento</h5>
+
+                    <div class="d-flex align-items-center gap-2 style-select-container w-100 w-sm-auto" *ngIf="estatusConstancia !== 'Completada'">
+                        <select class="form-select form-select-sm text-secondary small fw-semibold border-success" 
+                                [(ngModel)]="jefeSeleccionado" 
+                                style="max-width: 240px; font-size: 0.85rem; border-color: #007A33 !important;">
+                            <option value="" disabled selected>Seleccione Jefe Directo...</option>
+                            <option *ngFor="let jefe of listaJefes" [value]="jefe.nombre">
+                                {{ jefe.nombre }}
+                            </option>
+                        </select>
+
+                        <button class="btn btn-outline-success btn-sm fw-bold px-3 text-nowrap" 
+                                [disabled]="!jefeSeleccionado"
+                                (click)="descargarResponsiva()"
+                                style="color: #007A33 !important; border-color: #007A33 !important;">
+                            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Descargar Formato
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="estatusConstancia !== 'Completada'">
+                    <div class="upload-zone text-center p-5 rounded-3 border border-2 border-dashed d-flex flex-column align-items-center justify-content-center"
+                        [class.dragging]="isDragging" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()"
+                        (drop)="onDrop($event)" (click)="fileInput.click()">
+
+                        <i class="bi bi-cloud-arrow-up-fill text-success mb-3"
+                            style="font-size: 3rem; color: #007A33 !important;"></i>
+                        <p class="fw-semibold text-dark m-0">Arrastre su responsiva aquí o <span
+                                class="text-success text-decoration-underline" style="cursor:pointer;">busque su
+                                archivo</span></p>
+                        <small class="text-muted mt-1">Solo se admiten archivos en formato PDF (Máx. 5MB)</small>
+
+                        <input type="file" #fileInput (change)="onFileSelected($event)" accept="application/pdf"
+                            style="display: none;">
+                    </div>
+
+                    <div *ngIf="archivoSeleccionado"
+                        class="mt-3 p-3 bg-light rounded-3 d-flex align-items-center justify-content-between small">
+                        <div class="d-flex align-items-center truncate-text" style="max-width: 80%;">
+                            <i class="bi bi-filetype-pdf text-danger fs-4 me-2"></i>
+                            <span class="fw-semibold text-dark text-truncate">{{ archivoSeleccionado.name }}</span>
+                        </div>
+                        <button class="btn btn-sm btn-link text-danger p-0" (click)="removerArchivo()">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-success w-100 fw-bold py-2 mt-4 shadow-sm"
+                        [disabled]="!archivoSeleccionado || cargando" (click)="subirDocumento()"
+                        style="background-color: #007A33 !important; border: none;">
+                        <span *ngIf="!cargando"><i class="bi bi-cloud-upload-fill me-1"></i> Subir Responsiva</span>
+                        <span *ngIf="cargando" class="spinner-border spinner-border-sm" role="status"></span>
+                    </button>
+                </div>
+
+                <div *ngIf="estatusConstancia === 'Completada'"
+                    class="text-center py-5 animate__animated animate__fadeIn">
+                    <div class="p-4 rounded-3 bg-light border border-dashed mb-4">
+                        <i class="bi bi-shield-check text-success display-4 mb-2 d-block"
+                            style="color: #007A33 !important;"></i>
+                        <h6 class="fw-bold text-dark mb-1">Documento Resguardado con Éxito</h6>
+                        <p class="text-muted small m-0 px-3">Su responsiva ya se encuentra registrada en la base de
+                            datos local. Si necesita actualizar el archivo firmado o corregir un error, presione el
+                            botón de abajo.</p>
+                    </div>
+
+                    <button class="btn btn-warning w-100 fw-bold py-2 shadow-sm text-dark font-weight-bold"
+                        (click)="habilitarModificacion()">
+                        <i class="bi bi-pencil-square me-1"></i> Modificar Responsiva
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold mb-4 text-dark">Estado de su Documentación</h5>
+
+                    <div class="p-4 rounded-4 text-center mb-4"
+                        [ngClass]="estatusConstancia === 'Completada' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'">
+
+                        <i class="bi mb-2 d-block"
+                            [ngClass]="estatusConstancia === 'Completada' ? 'bi-file-earmark-check-fill fs-1' : 'bi-file-earmark-x-fill fs-1'"></i>
+                        <span class="small text-uppercase fw-bold letter-spacing">Estatus Actual</span>
+                        <h3 class="fw-extrabold m-0 mt-1">{{ estatusConstancia }}</h3>
+                    </div>
+
+                    <div class="border-top pt-3 small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tipo de Archivo:</span>
+                            <span class="fw-semibold text-dark">Responsiva de Personal</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Archivo guardado:</span>
+                            <span class="fw-semibold text-dark text-truncate ms-2" style="max-width: 180px;">
+                                {{ nombreArchivoGuardado || 'Ninguno' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <button *ngIf="nombreArchivoGuardado" class="btn btn-outline-success w-100 fw-bold btn-sm mt-4"
+                    (click)="verPdfActual()">
+                    <i class="bi bi-eye-fill me-1"></i> Visualizar Archivo Subido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
