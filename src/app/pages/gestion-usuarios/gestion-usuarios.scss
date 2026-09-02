@@ -1,0 +1,62 @@
+.card-adm {
+    border-radius: 10px !important;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+
+    .header-solicitudes {
+        background-color: #fff3cd !important;
+        color: #664d03 !important;
+    }
+
+    .header-activos {
+        background-color: #007A33 !important;
+        color: #ffffff !important;
+    }
+
+    .badge-count {
+        font-size: 0.85rem;
+        padding: 0.4em 0.7em;
+        border-radius: 20px;
+    }
+}
+
+.table {
+    th {
+        font-weight: 600;
+        color: #495057;
+        background-color: #f8f9fa;
+        padding: 12px 8px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    td {
+        padding: 14px 8px;
+        color: #212529;
+    }
+}
+
+.select-rol {
+    font-size: 0.85rem !important;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+        border-color: #007A33;
+        box-shadow: 0 0 0 0.25rem rgba(0, 122, 51, 0.15);
+    }
+}
+
+.btn-ver-doc {
+    transition: transform 0.2s;
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.btn-eliminar-user {
+    font-size: 0.8rem;
+    font-weight: 500;
+}

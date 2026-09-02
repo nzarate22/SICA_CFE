@@ -20,6 +20,9 @@ export class GestionIncidencias {
   fechaInicio: string = '';
   fechaFin: string = '';
   nombreColaborador: string = '';
+  rpeConfirmado: string = '';
+  fechaMinimaPermitida: string = '';
+  nombreUsuarioLogueado: string = '';
 
   listaEventos: any[] = [];
   cargando: boolean = false;
@@ -32,7 +35,10 @@ export class GestionIncidencias {
   constructor(
     private router: Router,
     private eventoService: Eventos
-  ) { }
+  ) {
+    this.calcularFechaMinima();
+    this.nombreUsuarioLogueado = localStorage.getItem('nombreAdmin') || 'Administrador';
+  }
 
   onRpeChange() { }
   onFechaChange() { }
@@ -40,6 +46,11 @@ export class GestionIncidencias {
   buscar() {
     if (!this.rpeBusqueda || !this.fechaInicio || !this.fechaFin) {
       alert('Por favor, ingrese el RPE y el rango de fechas completo.');
+      return;
+    }
+
+    if (this.fechaInicio < this.fechaMinimaPermitida) {
+      alert('Por políticas de seguridad de CFE, solo se pueden consultar datos de los últimos 3 meses.');
       return;
     }
 
@@ -83,6 +94,7 @@ export class GestionIncidencias {
     this.nombreColaborador = '';
     this.totalRetardos = 0;
     this.totalSalidasAnticipadas = 0;
+    this.rpeConfirmado = '';
 
     if (this.busquedaActiva) {
       this.busquedaActiva.unsubscribe();
@@ -95,11 +107,13 @@ export class GestionIncidencias {
   private procesarDatos(datos: any[]) {
     this.totalRetardos = 0;
     this.totalSalidasAnticipadas = 0;
+    this.rpeConfirmado = this.rpeBusqueda;
 
     this.listaEventos = datos.map((e: any) => {
       const estatus = this.obtenerEstatus(e);
 
-      if (estatus === 'Retardo' || estatus === 'Retardo / S. Anticipada') {
+      if (estatus === 'Retardo' || estatus === 'Retardo / S. Anticipada' ||
+        estatus === 'Retardo / S/S' || estatus === 'Retardo / S/E') {
         this.totalRetardos++;
       }
       if (estatus === 'Salida Anticipada' || estatus === 'Retardo / S. Anticipada') {
@@ -132,13 +146,16 @@ export class GestionIncidencias {
     const inicioRetardo = 8 * 3600 + 60;
     const horaSalida = 16 * 3600;
     const medioDia = 12 * 3600;
+    const unaHora = 3600;
 
     if (entrada === -1 && salida === -1) return 'Falta';
     if (entrada === -1) return 'S/E';
-    if (salida === -1) return 'S/S';
+    if (salida === -1) return entrada >= inicioRetardo ? 'Retardo / S/S' : 'S/S';
 
-    if (entrada < medioDia && salida < medioDia) return 'S/S';
-    if (entrada >= medioDia && salida >= medioDia) return 'S/E';
+    if (Math.abs(salida - entrada) < unaHora) {
+      if (entrada < medioDia) return 'S/S';
+      return 'S/E';
+    }
 
     if (entrada >= inicioRetardo && salida < horaSalida) return 'Retardo / S. Anticipada';
     if (entrada >= inicioRetardo) return 'Retardo';
@@ -166,14 +183,20 @@ export class GestionIncidencias {
       doc.setLineWidth(0.5);
       doc.line(14, 30, 196, 30);
 
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.setFont('helvetica', 'italic');
+      doc.text(`Generado por: ${this.nombreUsuarioLogueado}`, 14, 36);
+
       doc.setFontSize(11);
       doc.setTextColor(0);
-      doc.text(`Colaborador: ${this.nombreColaborador}`, 14, 40);
-      doc.text(`RPE: ${this.rpeBusqueda}`, 14, 47);
-      doc.text(`Periodo: ${this.fechaInicio} al ${this.fechaFin}`, 14, 54);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Colaborador: ${this.nombreColaborador}`, 14, 44);
+      doc.text(`RPE: ${this.rpeBusqueda}`, 14, 51);
+      doc.text(`Periodo: ${this.fechaInicio} al ${this.fechaFin}`, 14, 58);
 
       autoTable(doc, {
-        startY: 62,
+        startY: 66,
         head: [['Fecha', 'Entrada', 'Salida', 'Dispositivo', 'Estatus']],
         body: this.listaEventos.map(e => [
           e.fecha,
@@ -218,9 +241,24 @@ export class GestionIncidencias {
     };
   }
 
+  private calcularFechaMinima() {
+    const hoy = new Date();
+    hoy.setMonth(hoy.getMonth() - 3);
+
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+
+    this.fechaMinimaPermitida = `${anio}-${mes}-${dia}`;
+  }
+
   cerrarSesion() {
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
       this.router.navigate(['/login']);
     }
+  }
+
+  regresar() {
+    this.router.navigate(['/menu-principal']);
   }
 }

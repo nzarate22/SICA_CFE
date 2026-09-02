@@ -12,6 +12,6 @@ export class Auth {
   constructor(private http: HttpClient) { }
 
   login(rpe: string, password: string): Observable<any> {
-    return this.http.post(`${this.URL_API}/login.php`, { rpe, password });
+    return this.http.post<any>('http://localhost/sica/api/login.php', { rpe, password });
   }
 }

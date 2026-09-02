@@ -1,4 +1,7 @@
 export const environment = {
     production: true,
-    apiUrl: 'http://localhost/api-sica'
+    apiUrl: 'http:/localhost/sica/api'
 };
+
+
+

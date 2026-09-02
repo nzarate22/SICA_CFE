@@ -1,0 +1,71 @@
+.card-seleccion {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-top: 4px solid transparent !important;
+
+    &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+
+        &.bg-success-subtle {
+            border-top-color: #198754 !important;
+        }
+
+        border-top-color: #0d6efd !important;
+    }
+
+    &:first-child:hover {
+        border-top-color: #198754 !important;
+    }
+
+    &:nth-child(3):hover {
+        border-top-color: #007A33 !important;
+    }
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.btn-cerrar {
+  background-color: transparent;
+  color: #555; 
+  border: 1px solid #ccc; 
+  transition: all 0.3s ease; 
+  padding: 8px 16px;
+  border-radius: 8px; 
+
+  i {
+    color: #555;
+  }
+
+  &:hover, &:active {
+    background-color: #fff5f5; 
+    color: #dc3545;
+    border-color: #dc3545; 
+    
+    i {
+      color: #dc3545; 
+    }
+  }
+}
+
+.btn-outline-cfe {
+  background-color: transparent !important;
+  color: #007A33 !important;
+  border: 1px solid #007A33 !important; 
+  border-radius: 6px; 
+  transition: all 0.25s ease-in-out;
+
+  &:hover {
+    background-color: #007A33 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(0, 122, 51, 0.15);
+  }
+}
